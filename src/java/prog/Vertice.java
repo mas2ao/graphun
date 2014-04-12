@@ -92,6 +92,5 @@ public class Vertice {
     public void setTempoFin(int tempoFin) {
         this.tempoFin = tempoFin;
     }
-    
-    
+  
 }

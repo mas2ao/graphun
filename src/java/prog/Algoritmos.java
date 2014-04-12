@@ -15,18 +15,7 @@ import java.util.LinkedList;
  */
 public class Algoritmos {
     
-    public static void executar(Grafo g){
-        
-        bfs(g);   //ok
-        //bfSingle(g); //ok
-        //bfAll(g); //ok
-        //dkSingle(g); //ok
-        //dkAll(g); //ok
-        //fw(g);  //ok
-        //scc(g);
-    }
-    
-    private static void bfs(Grafo g){
+    public static void bfs(Grafo g){
         for (Vertice v: g.getVertices()){
             v.setCor(0);  //0=branco; 1=cinza; 2=preto
             v.setDistancia(-1);
@@ -38,10 +27,9 @@ public class Algoritmos {
     
         LinkedList<Vertice> fila = new LinkedList<>();
         Vertice v;
-        
         fila.add(g.getVertices().get(0));
         while (!fila.isEmpty()){
-            v = fila.remove();
+            v = fila.removeFirst();
             for (Aresta a: v.getVerticeAdj()){
                 if (a.getAresta().getCor() == 0){
                     a.getAresta().setDistancia(v.getDistancia()+1);
@@ -107,22 +95,23 @@ public class Algoritmos {
 //        }
 //    }
     
-    private static void bfSingle(Grafo g){
+    public static void bfSingle(Grafo g){
         bf(g, 0);
-        printBF(g, 0);
+        printBF(g);
     }
     
-    private static void bfAll(Grafo g){
+    public static void bfAll(Grafo g){
         for (int v=0; v<g.getVertices().size(); v++){
-            boolean all = bf(g, v);
-            printBF(g, v);
+            bf(g, v);
+            printBF(g);
         }
     }
     
-    private static boolean bf(Grafo g, int ini){
+    private static void bf(Grafo g, int ini){
         
 //        System.out.println("testando pegaPeso");
 //        System.out.println(g.getVertices().get(0).getNomeVertice()+" "+g.getVertices().get(0).getVerticeAdj().get(1).getAresta().getNomeVertice()+" "+pegaPeso(g.getVertices().get(0), g.getVertices().get(0).getVerticeAdj().get(1).getAresta()));
+        
         Float infinito = Float.POSITIVE_INFINITY;
         for (int i=0; i<g.getVertices().size(); i++){
             g.getVertices().get(i).setDistancia(infinito);
@@ -130,29 +119,60 @@ public class Algoritmos {
         }
         g.getVertices().get(ini).setDistancia(0);
         
-        
         for (int i=1; i<(g.getVertices().size()-1); i++){
-            for (Vertice u: g.getVertices()){
-                for (int j=0; j<u.getVerticeAdj().size();j++){
-                    int w = pegaPeso(u, u.getVerticeAdj().get(j).getAresta());
-                    relax(u, u.getVerticeAdj().get(j).getAresta(), w);
+            for (Vertice u:g.getVertices()){
+                for (Aresta v:u.getVerticeAdj()){
+                    int w = pegaPeso(u, v.getAresta());
+                    relax(u, v.getAresta(), w);
                 }
             }
         }
-        
-        for (Vertice u: g.getVertices()){
-            for (int v=0; v<u.getVerticeAdj().size(); v++){
-                if (u.getVerticeAdj().get(v).getAresta().getDistancia() > u.getDistancia() + pegaPeso(u, u.getVerticeAdj().get(v).getAresta())){
-                    return false;
-                }
-            }
-        }
-        return true;
+//        //verifica se tem loop negativo      
+//        for (Vertice u: g.getVertices()){
+//            for (int v=0; v<u.getVerticeAdj().size(); v++){
+//                if (u.getVerticeAdj().get(v).getAresta().getDistancia() > u.getDistancia() + pegaPeso(u, u.getVerticeAdj().get(v).getAresta())){
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
     }
     
+    private static void printBF(Grafo g){
+        Vertice u;
+        LinkedList<String> pilha = new LinkedList<>();
+        Float infinito = Float.POSITIVE_INFINITY;
+        for (Vertice v: g.getVertices()){
+            float dist = v.getDistancia();
+            if (dist != infinito){
+                pilha.add(String.valueOf((int)dist));
+                pilha.add(v.getNomeVertice());
+                u = v.getPai();
+                int i=1;
+                while (u != null){
+                    i++;
+                    pilha.add(u.getNomeVertice());
+                    u = u.getPai();
+                }
+                while (!pilha.isEmpty()){
+                    System.out.print(pilha.removeLast()+" ");
+                }
+                System.out.println("");
+            }
+        }
+        
+//        //print distancia entre vertices apos relax (saida dos arquivos arquivo.out)
+//        Float infinito = Float.POSITIVE_INFINITY;
+//        for (int v=0; v<g.getVertices().size(); v++){
+//            if (g.getVertices().get(v).getDistancia() != infinito ){
+//                System.out.println(g.getVertices().get(ini).getNomeVertice()+" "+g.getVertices().get(v).getNomeVertice()+" "+(int)g.getVertices().get(v).getDistancia());
+//            }
+//        }
+    }
+        
     private static void relax(Vertice u, Vertice v, int w){
         if (v.getDistancia() > u.getDistancia() + w){
-            v.setDistancia(u.getDistancia()+w);
+            v.setDistancia((int) u.getDistancia()+w);
             v.setPai(u);
         }
     }
@@ -167,26 +187,16 @@ public class Algoritmos {
         return peso;
     }
     
-    private static void printBF(Grafo g, int ini){
-        Float infinito = Float.POSITIVE_INFINITY;
-        for (int v=0; v<g.getVertices().size(); v++){
-            if (g.getVertices().get(v).getDistancia() != infinito ){
-                System.out.println(g.getVertices().get(ini).getNomeVertice()+" "+g.getVertices().get(v).getNomeVertice()+" "+(int)g.getVertices().get(v).getDistancia());
-            }
-            
-        }
-    }
-    
-    private static void dkAll(Grafo g){
+    public static void dkAll(Grafo g){
         for (int v=0; v<g.getVertices().size(); v++){
             dk(g, v);
-            printDK(g, v);
+            printDK(g);
         }
     }
     
-    private static void dkSingle(Grafo g){
+    public static void dkSingle(Grafo g){
         dk(g, 0);
-        printDK(g, 0);
+        printDK(g);
     }
     
     private static void dk(Grafo g, int ini){
@@ -222,13 +232,37 @@ public class Algoritmos {
         return min;
     }
     
-    private static void printDK(Grafo g, int ini){
+    private static void printDK(Grafo g){
+        Vertice u;
+        LinkedList<String> pilha = new LinkedList<>();
         Float infinito = Float.POSITIVE_INFINITY;
-        for (int v=0; v<g.getVertices().size(); v++){
-            if (g.getVertices().get(v).getDistancia() != infinito ){
-                System.out.println(g.getVertices().get(ini).getNomeVertice()+" "+g.getVertices().get(v).getNomeVertice()+" "+(int)g.getVertices().get(v).getDistancia());
+        for (Vertice v: g.getVertices()){
+            float dist = v.getDistancia();
+            if (dist != infinito){
+                pilha.add(String.valueOf((int)dist));
+                pilha.add(v.getNomeVertice());
+                u = v.getPai();
+                int i=1;
+                while (u != null){
+                    i++;
+                    pilha.add(u.getNomeVertice());
+                    u = u.getPai();
+                }
+                while (!pilha.isEmpty()){
+                    System.out.print(pilha.removeLast()+" ");
+                }
+                System.out.println("");
             }
         }
+        
+        
+//        //verifica saida dos arquivos arquivo.out
+//        Float infinito = Float.POSITIVE_INFINITY;
+//        for (int v=0; v<g.getVertices().size(); v++){
+//            if (g.getVertices().get(v).getDistancia() != infinito ){
+//                System.out.println(g.getVertices().get(ini).getNomeVertice()+" "+g.getVertices().get(v).getNomeVertice()+" "+(int)g.getVertices().get(v).getDistancia());
+//            }
+//        }
     }
     
     private static int[][] criaMatrizAdj(Grafo g){
@@ -267,7 +301,7 @@ public class Algoritmos {
     }
     
     
-    private static void fw(Grafo g){
+    public static void fw(Grafo g){
         int[][] matAdj, matPai;
         matAdj = criaMatrizAdj(g);
         matPai = criaMatrizPai(matAdj);
@@ -285,7 +319,7 @@ public class Algoritmos {
                 }
             }
         }
-        printFW(g, matAdj);
+        printFW(matPai);
     }
     
     private static int[][] criaMatrizPai(int[][] mat){
@@ -304,15 +338,18 @@ public class Algoritmos {
         return matPai;
     }
     
-    private static void printFW(Grafo g, int[][] mat){
-        Integer infinito = Integer.MAX_VALUE;
-        for (int l=0; l<mat.length; l++){
-            for (int c=0; c<mat.length; c++){
-                if (mat[l][c] != infinito){
-                    System.out.println(" "+g.getVertices().get(l).getNomeVertice()+" "+g.getVertices().get(c).getNomeVertice()+" "+mat[l][c]);
-                }
-            }
-        }
+    private static void printFW(int[][] matPai){
+        
+        
+//        //imprime a saida dos arquivos arquivo.out
+//        Integer infinito = Integer.MAX_VALUE;
+//        for (int l=0; l<mat.length; l++){
+//            for (int c=0; c<mat.length; c++){
+//                if (mat[l][c] != infinito){
+//                    System.out.println(" "+g.getVertices().get(l).getNomeVertice()+" "+g.getVertices().get(c).getNomeVertice()+" "+mat[l][c]);
+//                }
+//            }
+//        }
     }
     
     

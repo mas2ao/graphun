@@ -41,6 +41,7 @@ public class Grafo {
         BufferedReader br = null;
         String linha;
         Grafo g;
+        int quant;
         
         g = new Grafo();
         arq = new File(entrada);
@@ -53,29 +54,59 @@ public class Grafo {
                 linha = br.readLine();
             }
             
-//mostra vertices            
+//            //mostra vertices            
 //            System.out.println("vertices");
 //            for(Vertice k : g.vertices){
 //                System.out.println(k.getNomeVertice());
 //            }
 //            System.out.println("");
-            
+            int i, j; 
+            i=0;
+            j=0;
             while(br.ready()){
                 String[] arestas = separaArestas(br.readLine());
-                for(Vertice v: this.vertices){
-                    if(v.getNomeVertice().equals(arestas[0])){
-                        for(Vertice v2: this.vertices){
-                            if(v2.getNomeVertice().equals(arestas[1])){
-                                if (arestas.length == 3){
-                                    addAresta(v, v2, Integer.parseInt(arestas[2]));
-                                } else{
-                                    addAresta(v, v2, 0);
-                                }
-                            }
+                if (!this.vertices.get(i).getNomeVertice().equals(arestas[0])){
+                    i++;
+                    if (!this.vertices.get(i).getNomeVertice().equals(arestas[0])){
+                        i=0;
+                        while(!this.vertices.get(i).getNomeVertice().equals(arestas[0])){
+                            i++;
                         }
                     }
                 }
+                
+                while(!this.vertices.get(j).getNomeVertice().equals(arestas[1])){
+                   j++;
+                   if (j == this.vertices.size()){
+                       j = 0;
+                   }
+                }
+                     
+                if (arestas.length == 3){
+                    addAresta(this.vertices.get(i), this.vertices.get(j), Integer.parseInt(arestas[2]));
+                } else{
+                    addAresta(this.vertices.get(i), this.vertices.get(j), 0);
+                }
+                
             }
+            
+//            //muito lento
+//            while(br.ready()){
+//                String[] arestas = separaArestas(br.readLine());
+//                for(Vertice v: this.vertices){
+//                    if(v.getNomeVertice().equals(arestas[0])){
+//                        for(Vertice v2: this.vertices){
+//                            if(v2.getNomeVertice().equals(arestas[1])){
+//                                if (arestas.length == 3){
+//                                    addAresta(v, v2, Integer.parseInt(arestas[2]));
+//                                } else{
+//                                    addAresta(v, v2, 0);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
             br.close();
             fr.close();
             
@@ -116,7 +147,8 @@ public class Grafo {
     
     public void addAresta(Vertice v, Vertice a, int peso){
         v.addAdj(a, peso);
-        
     }
+    
+    
     
 }
